@@ -1,6 +1,6 @@
 library(data.table)
 ## Reading data
-dt = fread('ships_04112020/ships.csv')
+dt <- fread('ships_04112020/ships.csv')
 
 ## Getting the next latitude and longitude for each observations
 setkey(dt,ship_type,SHIPNAME,DATETIME)
@@ -9,7 +9,7 @@ dt[,':='(LAT_NEXT=shift(LAT,type='lead'),
 
 ## Function to compute distance between 2 coordinate point
 ## Output will have meter unit
-fnHaversine = function(lat_from, lon_from, lat_to, lon_to, r = 6378137){
+fnHaversine <- function(lat_from, lon_from, lat_to, lon_to, r = 6378137){
   radians = pi/180
   lat_to = lat_to * radians
   lat_from = lat_from * radians
@@ -26,7 +26,7 @@ dt[,distance:=fnHaversine(LAT,LON,LAT_NEXT,LON_NEXT)]
 
 ## Selecting observations when it sailed the longest distance
 ## If there are ties, the smallest DATETIME will be picked
-dt=dt[,.SD[which.max(distance)],.(ship_type,SHIPNAME)]
+dt <- dt[,.SD[which.max(distance)],.(ship_type,SHIPNAME)]
 
 ## Output relevant data for shiny app
 fwrite(dt[,.(ship_type,SHIPNAME,LAT,LON,LAT_NEXT,LON_NEXT,distance)],"data.csv")
